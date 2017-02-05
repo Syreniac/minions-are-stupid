@@ -8,6 +8,9 @@ public static class HexMetrics{
 	public const int ChunkWidth = 10;
 	public const int ChunkHeight = 10;
 
+	public const int WidthInCells = WidthInChunks*ChunkWidth;
+	public const int HeightInCells = HeightInChunks*ChunkHeight;
+
 	public const int GridWidth = 10;
 	public const int GridHeight = 10;
 

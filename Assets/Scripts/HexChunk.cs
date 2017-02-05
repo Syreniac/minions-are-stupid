@@ -49,6 +49,27 @@ public class HexChunk : MonoBehaviour {
 		mesh.triangles = triangles.ToArray();
 		mesh.RecalculateNormals();
 		mesh.colors = colors.ToArray();
+		GetComponent<MeshCollider>().sharedMesh = null;
+		GetComponent<MeshCollider>().sharedMesh = mesh;
+	}
+
+	public void ParentCells() {
+		for(int x = startX; x < endX; x++){
+			for(int y = startY; y < endY; y++){
+				grid.cells[x,y].transform.SetParent(gameObject.transform);
+			}
+		}
+	}
+
+	public HexCell subtestCollision(Ray ray){
+		for(int x = startX; x < endX; x++){
+			for(int y = startY; y < endY; y++){
+				if(grid.cells[x,y].subtestCollision(ray)){
+					return grid.cells[x,y];
+				}
+			}
+		}
+		return null;
 	}
 
 	void Collide(){

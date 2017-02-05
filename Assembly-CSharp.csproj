@@ -51,7 +51,7 @@
      <Compile Include="Assets\Scripts\HexChunk.cs" />
      <Compile Include="Assets\Scripts\HexGrid.cs" />
      <Compile Include="Assets\Scripts\HexMetrics.cs" />
-     <None Include="Assets\VertexColors.shader" />
+     <None Include="Assets\Materials\VertexColors.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
