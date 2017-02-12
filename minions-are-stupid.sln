@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{96988C7F-8925-8419-E598-EDB8D0080175}") = "minions-are-stupid", "Assembly-CSharp.csproj", "{3D6B7235-19B3-DF2F-4540-D931A9A3C3CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D6B7235-19B3-DF2F-4540-D931A9A3C3CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6B7235-19B3-DF2F-4540-D931A9A3C3CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6B7235-19B3-DF2F-4540-D931A9A3C3CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6B7235-19B3-DF2F-4540-D931A9A3C3CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
