@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +15,9 @@ public class HexCell : MonoBehaviour {
 	private List<Vector3> localvertices;
 	private List<int> localtriangles;
 	private List<Color> localcolors;
+
+	private Color color;
+	private int colorHeight;
 
 	// Use this for initialization
 	void Start () {
@@ -87,21 +89,27 @@ public class HexCell : MonoBehaviour {
 	}
 
 	void AddTriangleColor(List<Color> colors){
-		Color color;
-		if(highlightedCell == this){
-			color = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
-		}
-		else if(height > 80f){
-			color = new Color(235f/255f, 235f/255f, 235f/255f, 1f);
-		}
-		else if(height > 60f){
-			color = new Color(212f/255f, 192f/255f, 144f/255f, 1f);
-		}
-		else if(height > 20f){
-			color = new Color(52f/255f, 237f/255f, 80f/255f, 1f);
-		}
-		else{
-			color = new Color(37f/255f, 174f/255f, 230f/255f, 1f);
+		if(height != colorHeight){
+			colorHeight = height;
+			if(highlightedCell == this){
+				color = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
+			}
+			else if(height > 80f){
+				color = new Color(250f/255f, 250f/255f, 250f/255f, 1f);
+			}
+			else if(height > 60f){
+				color = new Color(212f/255f, 192f/255f, 144f/255f, 1f);
+			}
+			else if(height > 20f){
+				// Green
+				color = new Color((52f+Random.Range(-25, 25))/255f, 
+								  (237f+Random.Range(-25, 25))/255f,
+								  (80f+Random.Range(-25, 25))/255f,
+								  1f);
+			}
+			else{
+				color = new Color(37f/255f, 174f/255f, 230f/255f, 1f);
+			}
 		}
 		colors.Add(color);
 		colors.Add(color);
