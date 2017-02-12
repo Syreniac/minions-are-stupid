@@ -62,14 +62,18 @@ public class HexChunk : MonoBehaviour {
 	}
 
 	public HexCell subtestCollision(Ray ray){
+		HexCell cell = null;
+		float distance = Mathf.Infinity;
 		for(int x = startX; x < endX; x++){
 			for(int y = startY; y < endY; y++){
-				if(grid.cells[x,y].subtestCollision(ray)){
-					return grid.cells[x,y];
+				float hitDistance = grid.cells[x,y].subtestCollision(ray);
+				if(hitDistance < distance){
+					cell = grid.cells[x,y];
+					distance = hitDistance;
 				}
 			}
 		}
-		return null;
+		return cell;
 	}
 
 	void Collide(){

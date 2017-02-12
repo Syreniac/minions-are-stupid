@@ -19,6 +19,14 @@ public class HexGrid : MonoBehaviour {
 	// Initialised in MakeChunks()
 	public HexChunk highlightedChunk;
 
+	public TestUnit testUnitPrefab;
+
+	public TestUnit testUnit;
+
+	private float nextActionTime;
+
+	private List<GameObject> tempDrawnPath;
+
 	// Use this for initialization
 	void Start () {
 		widthInChunks = HexMetrics.WidthInChunks;
@@ -31,7 +39,13 @@ public class HexGrid : MonoBehaviour {
 		MakeCells();
 		GenerateTerrain();
 		MakeChunks();
+		MakeTestUnit();
 		//MakeMeshForAllChunks();
+	}
+
+	void MakeTestUnit(){
+		testUnit = Instantiate<TestUnit>(testUnitPrefab);
+		testUnit.Make(cells[0,0]);
 	}
 
 	void MakeChunks(){
@@ -143,13 +157,15 @@ public class HexGrid : MonoBehaviour {
 	}
 
 	void Update () {
-		Debug.Log("update");
 		if (Input.GetMouseButtonDown(0)) {
-			Debug.Log("input");
 			HandleInput();
 		}
 		HighlightHoveredCell();
-	}
+		if (Time.time > nextActionTime ){
+			nextActionTime = Time.time + 1f;
+			//testUnit.step();
+		}
+	}	
 
 	void HighlightHoveredCell(){
 	    Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
@@ -167,7 +183,6 @@ public class HexGrid : MonoBehaviour {
 					highlightedChunk.RerenderCells();
 					highlightedChunk = chunk;
 				}
-				Debug.Log(cell.name);
 				chunk.RerenderCells();
 			}
 		}
@@ -177,13 +192,19 @@ public class HexGrid : MonoBehaviour {
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(inputRay, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Chunks"))) {
-			Debug.Log(hit.collider.gameObject.name);
 			HexChunk chunk = hit.collider.gameObject.GetComponent<HexChunk>();
 			HexCell cell = chunk.subtestCollision(inputRay);
 			if(cell != null){
-				cell.recursivelyAdjustHeight(20, 5, 1);
+				testUnit.findPath(cell);
+				if(tempDrawnPath != null){
+					foreach(GameObject o in tempDrawnPath){
+						Object.Destroy(o);
+					}
+				}
+				tempDrawnPath = testUnit.debugDrawPath(testUnitPrefab);
+				//cell.recursivelyAdjustHeight(20, 5, 1);
 
-				chunk.RerenderCells();
+				//chunk.RerenderCells();
 			}
 		}
 	}

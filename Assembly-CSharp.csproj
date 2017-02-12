@@ -47,10 +47,15 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\CameraScripts\CameraControls.cs" />
+     <Compile Include="Assets\Scripts\FastPriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\FastPriorityQueueNode.cs" />
      <Compile Include="Assets\Scripts\HexCell.cs" />
+     <Compile Include="Assets\Scripts\HexCellGameLogic.cs" />
      <Compile Include="Assets\Scripts\HexChunk.cs" />
      <Compile Include="Assets\Scripts\HexGrid.cs" />
      <Compile Include="Assets\Scripts\HexMetrics.cs" />
+     <Compile Include="Assets\Scripts\IFastPriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\TestUnit.cs" />
      <None Include="Assets\Materials\VertexColors.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

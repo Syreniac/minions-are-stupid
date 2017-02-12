@@ -6,8 +6,9 @@ public class HexCell : MonoBehaviour {
 
 	private static HexCell highlightedCell = null; 
 
-	private int x, y;
-	private float fx, fy;
+	// Array indices
+	public int x, y, z;
+	public float fx, fy;
 	private int height;
 	private HexGrid grid;
 
@@ -16,8 +17,13 @@ public class HexCell : MonoBehaviour {
 	private List<int> localtriangles;
 	private List<Color> localcolors;
 
+	public bool immovable;
+
 	private Color color;
-	private int colorHeight;
+	private int colorHeight =99999;
+
+    public float Priority { get; protected internal set; }
+    public int QueueIndex { get; internal set; }
 
 	// Use this for initialization
 	void Start () {
@@ -33,10 +39,15 @@ public class HexCell : MonoBehaviour {
 		fx = (float) x;
 		fy = (float) y;
 
+
 		fx = (fx + fy * 0.5f - y / 2) * (HexMetrics.innerRadius * 2f);
 		fy = fy * (HexMetrics.outerRadius * 1.5f);
 		this.x = x;
 		this.y = y;
+		this.z = -x - y;
+
+		immovable = Random.Range(0, 3) == 0;
+
 		GetComponent<MeshFilter>().mesh = collisionMesh = new Mesh();
 		height = 30;
 		localvertices = new List<Vector3>();
@@ -49,6 +60,9 @@ public class HexCell : MonoBehaviour {
 		localtriangles.Clear();
 		localcolors.Clear();
 		float fheight = (float) Mathf.Max(20,height);
+		if(immovable){
+			fheight = 0;	
+		}
 		Vector3 center = new Vector3(fx, fheight, fy);
 		for(int i = 0; i < 6; i++)
 		{
@@ -89,10 +103,22 @@ public class HexCell : MonoBehaviour {
 	}
 
 	void AddTriangleColor(List<Color> colors){
+		if(highlightedCell != null){
+			List<HexCell> highlightedCells = new List<HexCell>();
+			highlightedCells.Add(highlightedCell);
+			//highlightedCell.addNeighbourCells(highlightedCells);
+			if(highlightedCells.Contains(this)){
+				Color tempcolor = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
+				colors.Add(tempcolor);
+				colors.Add(tempcolor);
+				colors.Add(tempcolor);
+				return;
+			}
+		}
 		if(height != colorHeight){
 			colorHeight = height;
-			if(highlightedCell == this){
-				color = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
+			if(immovable){
+				color = Color.black;
 			}
 			else if(height > 80f){
 				color = new Color(250f/255f, 250f/255f, 250f/255f, 1f);
@@ -116,9 +142,12 @@ public class HexCell : MonoBehaviour {
 		colors.Add(color);
 	}
 
-	public bool subtestCollision(Ray ray){
+	public float subtestCollision(Ray ray){
 		RaycastHit hit;
-		return GetComponent<MeshCollider>().Raycast(ray, out hit, Mathf.Infinity);
+		if(GetComponent<MeshCollider>().Raycast(ray, out hit, Mathf.Infinity)){
+			return hit.distance;
+		}
+		return Mathf.Infinity;
 	}
 
 	public void addHeight(){
@@ -130,11 +159,15 @@ public class HexCell : MonoBehaviour {
 	}
 
 	public void setHeight(int newHeight){
-		height = newHeight;
+		height = newHeight;	
 	}
 
 	public int getHeight(){
 		return height;
+	}
+
+	public Vector3 getPosition(){
+		return gameObject.transform.position;
 	}
 
 	public int smooth(){
@@ -200,6 +233,10 @@ public class HexCell : MonoBehaviour {
 
 	}
 
+	public void debugHexCoords(){
+		Debug.Log(x+","+y+","+z);
+	}
+
 	public void addNeighbourCells(List<HexCell> cells){
 		bool yCanGoDown = this.y > 0;
 		bool xCanGoDown = this.x > 0;
@@ -225,12 +262,23 @@ public class HexCell : MonoBehaviour {
 				cells.Add(grid.cells[this.x + 1,this.y]);
 			}
 		}
-		if(xCanGoUp && yCanGoUp){
+		if(xCanGoDown && yCanGoUp && (y%2 == 0)){
+			if(!cells.Contains(grid.cells[this.x - 1,this.y + 1])){
+				cells.Add(grid.cells[this.x - 1,this.y + 1]);
+			}
+		}
+		if(xCanGoDown && yCanGoDown && (y%2 == 0)){
+			if(!cells.Contains(grid.cells[this.x - 1,this.y - 1])){
+				cells.Add(grid.cells[this.x - 1,this.y - 1]);
+			}
+		}
+
+		if(xCanGoUp && yCanGoUp && (y%2 != 0)){
 			if(!cells.Contains(grid.cells[this.x + 1,this.y + 1])){
 				cells.Add(grid.cells[this.x + 1,this.y + 1]);
 			}
 		}
-		if(xCanGoUp && yCanGoDown){
+		if(xCanGoUp && yCanGoDown && (y%2 != 0)){
 			if(!cells.Contains(grid.cells[this.x + 1,this.y - 1])){
 				cells.Add(grid.cells[this.x + 1,this.y - 1]);
 			}
