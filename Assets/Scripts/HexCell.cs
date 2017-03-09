@@ -11,6 +11,7 @@ public class HexCell : MonoBehaviour {
 	public float fx, fy;
 	private int height;
 	private HexGrid grid;
+	private List<HexCell> neighbours;
 
 	private Mesh collisionMesh;
 	private List<Vector3> localvertices;
@@ -21,6 +22,8 @@ public class HexCell : MonoBehaviour {
 
 	private Color color;
 	private int colorHeight =99999;
+
+	public TestUnit Unit {get; set;}
 
     public float Priority { get; protected internal set; }
     public int QueueIndex { get; internal set; }
@@ -46,13 +49,46 @@ public class HexCell : MonoBehaviour {
 		this.y = y;
 		this.z = -x - y;
 
-		immovable = Random.Range(0, 3) == 0;
+		//immovable = Random.Range(0, 3) == 0;
 
 		GetComponent<MeshFilter>().mesh = collisionMesh = new Mesh();
 		height = 30;
 		localvertices = new List<Vector3>();
 		localtriangles = new List<int>();
 		localcolors = new List<Color>();
+		generateNeighbours();
+	}
+
+	private void generateNeighbours(){
+		neighbours = new List<HexCell>();
+		bool yCanGoDown = this.y > 0;
+		bool xCanGoDown = this.x > 0;
+		bool xCanGoUp = this.x < HexMetrics.WidthInCells - 1;
+		bool yCanGoUp = this.y < HexMetrics.HeightInCells - 1;
+		if(yCanGoDown){
+			neighbours.Add(grid.cells[this.x,this.y - 1]);
+		}
+		if(yCanGoUp){
+			neighbours.Add(grid.cells[this.x,this.y + 1]);
+		}
+		if(xCanGoDown){
+			neighbours.Add(grid.cells[this.x - 1,this.y]);
+		}
+		if(xCanGoUp){
+			neighbours.Add(grid.cells[this.x + 1,this.y]);
+		}
+		if(xCanGoDown && yCanGoUp && (y%2 == 0)){
+			neighbours.Add(grid.cells[this.x - 1,this.y + 1]);
+		}
+		if(xCanGoDown && yCanGoDown && (y%2 == 0)){
+			neighbours.Add(grid.cells[this.x - 1,this.y - 1]);
+		}
+		if(xCanGoUp && yCanGoUp && (y%2 != 0)){
+			neighbours.Add(grid.cells[this.x + 1,this.y + 1]);
+		}
+		if(xCanGoUp && yCanGoDown && (y%2 != 0)){
+			neighbours.Add(grid.cells[this.x + 1,this.y - 1]);
+		}
 	}
 
 	public void Rerender(List<Vector3> vertices, List<int> triangles, List<Color> colors){
@@ -60,9 +96,9 @@ public class HexCell : MonoBehaviour {
 		localtriangles.Clear();
 		localcolors.Clear();
 		float fheight = (float) Mathf.Max(20,height);
-		if(immovable){
-			fheight = 0;	
-		}
+		//if(immovable){
+		//	fheight = 0;	
+		//}
 		Vector3 center = new Vector3(fx, fheight, fy);
 		for(int i = 0; i < 6; i++)
 		{
@@ -117,10 +153,10 @@ public class HexCell : MonoBehaviour {
 		}
 		if(height != colorHeight){
 			colorHeight = height;
-			if(immovable){
+			/*if(immovable){
 				color = Color.black;
 			}
-			else if(height > 80f){
+			else */if(height > 80f){
 				color = new Color(250f/255f, 250f/255f, 250f/255f, 1f);
 			}
 			else if(height > 60f){
@@ -238,50 +274,14 @@ public class HexCell : MonoBehaviour {
 	}
 
 	public void addNeighbourCells(List<HexCell> cells){
-		bool yCanGoDown = this.y > 0;
-		bool xCanGoDown = this.x > 0;
-		bool xCanGoUp = this.x < HexMetrics.WidthInCells - 1;
-		bool yCanGoUp = this.y < HexMetrics.HeightInCells - 1;
-		if(yCanGoDown){
-			if(!cells.Contains(grid.cells[this.x,this.y - 1])){
-				cells.Add(grid.cells[this.x,this.y - 1]);
+		foreach(HexCell cell in neighbours){
+			if(!cells.Contains(cell)){
+				cells.Add(cell);
 			}
 		}
-		if(yCanGoUp){
-			if(!cells.Contains(grid.cells[this.x,this.y + 1])){
-				cells.Add(grid.cells[this.x,this.y + 1]);
-			}
-		}
-		if(xCanGoDown){
-			if(!cells.Contains(grid.cells[this.x - 1,this.y])){
-				cells.Add(grid.cells[this.x - 1,this.y]);
-			}
-		}
-		if(xCanGoUp){
-			if(!cells.Contains(grid.cells[this.x + 1,this.y])){
-				cells.Add(grid.cells[this.x + 1,this.y]);
-			}
-		}
-		if(xCanGoDown && yCanGoUp && (y%2 == 0)){
-			if(!cells.Contains(grid.cells[this.x - 1,this.y + 1])){
-				cells.Add(grid.cells[this.x - 1,this.y + 1]);
-			}
-		}
-		if(xCanGoDown && yCanGoDown && (y%2 == 0)){
-			if(!cells.Contains(grid.cells[this.x - 1,this.y - 1])){
-				cells.Add(grid.cells[this.x - 1,this.y - 1]);
-			}
-		}
+	}
 
-		if(xCanGoUp && yCanGoUp && (y%2 != 0)){
-			if(!cells.Contains(grid.cells[this.x + 1,this.y + 1])){
-				cells.Add(grid.cells[this.x + 1,this.y + 1]);
-			}
-		}
-		if(xCanGoUp && yCanGoDown && (y%2 != 0)){
-			if(!cells.Contains(grid.cells[this.x + 1,this.y - 1])){
-				cells.Add(grid.cells[this.x + 1,this.y - 1]);
-			}
-		}
+	public bool hasNeighbour(HexCell cell){
+		return neighbours.Contains(cell);
 	}
 }

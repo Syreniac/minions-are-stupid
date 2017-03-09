@@ -10,7 +10,7 @@ public class HexGrid : MonoBehaviour {
 
 	private int widthInCells, heightInCells;
 
-	private HexChunk[,] chunks;
+	public HexChunk[,] chunks;
 
 	public HexChunk hexChunkPrefab;
 
@@ -21,7 +21,9 @@ public class HexGrid : MonoBehaviour {
 
 	public TestUnit testUnitPrefab;
 
-	public TestUnit testUnit;
+	public TestUnit testUnitPrefab2;
+
+	public List<TestUnit> testUnits = new List<TestUnit>();
 
 	private float nextActionTime;
 
@@ -39,13 +41,16 @@ public class HexGrid : MonoBehaviour {
 		MakeCells();
 		GenerateTerrain();
 		MakeChunks();
-		MakeTestUnit();
+		MakeTestUnits();
 		//MakeMeshForAllChunks();
 	}
 
-	void MakeTestUnit(){
-		testUnit = Instantiate<TestUnit>(testUnitPrefab);
-		testUnit.Make(cells[0,0]);
+	void MakeTestUnits(){
+		for(int i = 0; i < 4; i++){
+			TestUnit testUnit = Instantiate<TestUnit>(testUnitPrefab);
+			testUnit.Make(cells[i,i]);
+			testUnits.Add(testUnit);
+		}
 	}
 
 	void MakeChunks(){
@@ -80,6 +85,10 @@ public class HexGrid : MonoBehaviour {
 			for(y = 0; y < heightInCells; y++){
 				cells[x,y] = Instantiate<HexCell>(hexCellPrefab);
 				cells[x,y].name = "Cell " + x + "," + y;
+			}
+		}
+		for(x = 0; x < widthInCells; x++){
+			for(y = 0; y < heightInCells; y++){
 				cells[x,y].Make(this,x,y);
 			}
 		}
@@ -87,7 +96,7 @@ public class HexGrid : MonoBehaviour {
 
 	void GenerateTerrain(){
 
-		for(int i = 0; i < Random.Range(60, 100); i++){
+		/*for(int i = 0; i < Random.Range(1,3); i++){
 			if(Random.Range(0, 100) > 20){
 				AddHeightToCircle(Random.Range(0, widthInCells), Random.Range(0,heightInCells),
 									  Random.Range(8, 16), Random.Range(20,50));
@@ -100,7 +109,7 @@ public class HexGrid : MonoBehaviour {
 
 		for(int i = 0; i < 10; i++){
 			SmoothTerrain();
-		}
+		}*/
 	}
 
 	void SmoothTerrain(){
@@ -157,9 +166,6 @@ public class HexGrid : MonoBehaviour {
 	}
 
 	void Update () {
-		if (Input.GetMouseButtonDown(0)) {
-			HandleInput();
-		}
 		HighlightHoveredCell();
 		if (Time.time > nextActionTime ){
 			nextActionTime = Time.time + 1f;
@@ -188,24 +194,22 @@ public class HexGrid : MonoBehaviour {
 		}
 	}
 
-	void HandleInput () {
+	public HexCell projectRay(){
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(inputRay, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Chunks"))) {
 			HexChunk chunk = hit.collider.gameObject.GetComponent<HexChunk>();
-			HexCell cell = chunk.subtestCollision(inputRay);
-			if(cell != null){
-				testUnit.findPath(cell);
-				if(tempDrawnPath != null){
-					foreach(GameObject o in tempDrawnPath){
-						Object.Destroy(o);
-					}
-				}
-				tempDrawnPath = testUnit.debugDrawPath(testUnitPrefab);
-				//cell.recursivelyAdjustHeight(20, 5, 1);
+			return chunk.subtestCollision(inputRay);
+		}
+		return null;
+	}
 
-				//chunk.RerenderCells();
+	public bool canContinue(){
+		foreach(TestUnit testUnit in testUnits){
+			if(testUnit.canContinue()){
+				return true;
 			}
 		}
+		return false;
 	}
 }

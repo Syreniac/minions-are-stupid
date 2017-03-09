@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class HexMetrics{
-	public const int WidthInChunks = 10;
-	public const int HeightInChunks = 10;
+	public const int WidthInChunks = 2;
+	public const int HeightInChunks = 2;
 	public const int ChunkWidth = 10;
 	public const int ChunkHeight = 10;
 
