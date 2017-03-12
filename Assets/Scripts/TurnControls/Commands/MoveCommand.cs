@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoveCommand : ICommand{
 
-	public TestUnit Unit {get; private set;}
+	public BaseUnit Unit {get; private set;}
 
 	public HexCell Destination {get; private set;}
 
@@ -25,11 +25,11 @@ public class MoveCommand : ICommand{
 		return Unit != null && Destination != null;
 	}
 
-	public void clickedCell(HexCell cell){
-		if(Unit == null){
+	public void clickedCell(HexCell cell, KeyCode key){
+		if(key == KeyCode.Mouse0) {
 			Unit = cell.Unit;
 		}
-		else{
+		if(key == KeyCode.Mouse1) {
 			Destination = cell;
 		}
 	}

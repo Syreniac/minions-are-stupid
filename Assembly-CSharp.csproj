@@ -55,7 +55,6 @@
      <Compile Include="Assets\Scripts\HexGrid.cs" />
      <Compile Include="Assets\Scripts\HexMetrics.cs" />
      <Compile Include="Assets\Scripts\IFastPriorityQueue.cs" />
-     <Compile Include="Assets\Scripts\TestUnit.cs" />
      <Compile Include="Assets\Scripts\TurnControls\Commands\GroupMoveCommand.cs" />
      <Compile Include="Assets\Scripts\TurnControls\Commands\ICommand.cs" />
      <Compile Include="Assets\Scripts\TurnControls\Commands\MoveCommand.cs" />
@@ -63,6 +62,10 @@
      <Compile Include="Assets\Scripts\TurnControls\ReactionController.cs" />
      <Compile Include="Assets\Scripts\TurnControls\TurnController.cs" />
      <Compile Include="Assets\Scripts\TurnControls\UserInputController.cs" />
+     <Compile Include="Assets\Scripts\Units\BaseUnit.cs" />
+     <Compile Include="Assets\Scripts\Units\BaseUnitStats.cs" />
+     <Compile Include="Assets\Scripts\Units\TestUnit.cs" />
+     <Compile Include="Assets\Scripts\Units\TestUnitStats.cs" />
      <Compile Include="Assets\Scripts\Utility\PathfindingConditional.cs" />
      <Compile Include="Assets\Scripts\Utility\PathfindingUtil.cs" />
      <None Include="Assets\Materials\VertexColors.shader" />

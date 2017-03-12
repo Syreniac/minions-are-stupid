@@ -23,7 +23,7 @@ public class HexGrid : MonoBehaviour {
 
 	public TestUnit testUnitPrefab2;
 
-	public List<TestUnit> testUnits = new List<TestUnit>();
+	public List<BaseUnit> Units = new List<BaseUnit>();
 
 	private float nextActionTime;
 
@@ -47,9 +47,9 @@ public class HexGrid : MonoBehaviour {
 
 	void MakeTestUnits(){
 		for(int i = 0; i < 4; i++){
-			TestUnit testUnit = Instantiate<TestUnit>(testUnitPrefab);
-			testUnit.Make(cells[i,i]);
-			testUnits.Add(testUnit);
+			BaseUnit unit = Instantiate<BaseUnit>(testUnitPrefab);
+			unit.Make(cells[i,i]);
+			Units.Add(unit);
 		}
 	}
 
@@ -96,20 +96,20 @@ public class HexGrid : MonoBehaviour {
 
 	void GenerateTerrain(){
 
-		/*for(int i = 0; i < Random.Range(1,3); i++){
+		for(int i = 0; i < Random.Range(HexMetrics.TerrainCirclesMin,HexMetrics.TerrainCirclesMax); i++){
 			if(Random.Range(0, 100) > 20){
 				AddHeightToCircle(Random.Range(0, widthInCells), Random.Range(0,heightInCells),
-									  Random.Range(8, 16), Random.Range(20,50));
+									  Random.Range(10, 20), Random.Range(50,100));
 			}
 			else{
 				ApplyHeightToCircle(Random.Range(0, widthInCells), Random.Range(0,heightInCells),
-									  Random.Range(8, 16), 1);
+									  Random.Range(2, 4), 1);
 			}
 		}
 
-		for(int i = 0; i < 10; i++){
+		for(int i = 0; i < HexMetrics.SmoothCounts; i++){
 			SmoothTerrain();
-		}*/
+		}
 	}
 
 	void SmoothTerrain(){
@@ -205,8 +205,8 @@ public class HexGrid : MonoBehaviour {
 	}
 
 	public bool canContinue(){
-		foreach(TestUnit testUnit in testUnits){
-			if(testUnit.canContinue()){
+		foreach(BaseUnit unit in Units){
+			if(unit.canContinue()){
 				return true;
 			}
 		}

@@ -4,19 +4,12 @@ using UnityEngine;
 
 public class PathfindingUtil{
 
-	static public PathfindingConditional checkBlank {get; private set;}
-
-	static public PathfindingConditional checkUnits {get; private set;}
-
-	static public PathfindingConditional checkTerrain {get; private set;}
-
-	static public PathfindingConditional checkTerrainAndUnits {get; private set;}
+	static private PathfindingConditional checkBlank;
+	static private PathfindingCalculator calculateBlank;
 
 	static PathfindingUtil(){
 		checkBlank = new BlankPathfindingConditional();
-		checkUnits = new UnitPathfindingConditional();
-		checkTerrain = new TerrainPathfindingConditional();
-		checkTerrainAndUnits = new TerrainPathfindingConditional(){next = checkUnits};
+		calculateBlank = new BlankPathfindingCalculator();
 	}
 
 	public static PathfindingConditional combinePathfindingConditionals(params PathfindingConditional[] conditionals){
@@ -33,18 +26,10 @@ public class PathfindingUtil{
 	}
 
 	public static List<HexCell> findPath_Blank(HexCell start, HexCell destination){
-		return findPath(start, destination, checkBlank);
+		return findPath(null, start, destination, checkBlank, calculateBlank);
 	}
 
-	public static List<HexCell> findPath_Units(HexCell start, HexCell destination){
-		return findPath(start, destination, checkUnits);
-	}
-
-	public static List<HexCell> findPath_Terrain(HexCell start, HexCell destination){
-		return findPath(start, destination, checkTerrain);
-	}
-
-	public static List<HexCell> findPath(HexCell start, HexCell destination, PathfindingConditional conditional){
+	public static List<HexCell> findPath(BaseUnit unit, HexCell start, HexCell destination, PathfindingConditional conditional, PathfindingCalculator calculation){
 		
 		Dictionary<HexCell, HexCellPathfinding> pathfindingValues = new Dictionary<HexCell, HexCellPathfinding>();
 		FastPriorityQueue<HexCell> open = new FastPriorityQueue<HexCell>(999);
@@ -53,8 +38,8 @@ public class PathfindingUtil{
 		HexCellPathfinding startNode = new HexCellPathfinding{
 			cell = start,
 			parent=null,
-			g=0,
-			h=PathfindingUtil.hexGridDistance(start, destination)
+			costSoFar=0,
+			distanceRemaining=PathfindingUtil.hexGridDistance(start, destination)
 		};
 
 		HexCellPathfinding closest = startNode;
@@ -65,7 +50,7 @@ public class PathfindingUtil{
 		while(open.Count != 0){
 			HexCell first = open.Dequeue();
 
-			if(pathfindingValues[first].h < closest.h){
+			if(pathfindingValues[first].distanceRemaining < closest.distanceRemaining){
 				closest = pathfindingValues[first];
 			}
 
@@ -79,7 +64,8 @@ public class PathfindingUtil{
 
 			foreach(HexCell cell in neighbours){
 				Debug.Log(cell);
-				if(!closed.Contains(cell) && conditional.check(cell)){
+				if(!closed.Contains(cell) && conditional.check(unit, cell, pathfindingValues[first].cell)){
+					int calculatedCost = calculation.calculate(unit, cell, pathfindingValues[first].cell);
 					if(!open.Contains(cell)){
 
 						int hexDistance = hexGridDistance(destination, cell);
@@ -87,20 +73,22 @@ public class PathfindingUtil{
 							open.Enqueue(cell, hexGridDistance(destination, cell));
 							pathfindingValues.Add(cell, new HexCellPathfinding{
 								cell = cell,
-								g = pathfindingValues[first].g+1,
-								h = hexDistance,
+								costSoFar = pathfindingValues[first].costSoFar + calculatedCost,
+								distanceRemaining = hexDistance,
 								parent = pathfindingValues[first]
 							});	
 						}
 					}
 					else{
-						if(pathfindingValues[cell].g > pathfindingValues[first].g+1){
-							pathfindingValues[cell].g = pathfindingValues[first].g+1;
+						if(pathfindingValues[cell].costSoFar > pathfindingValues[first].costSoFar+calculatedCost){
+							pathfindingValues[cell].costSoFar = pathfindingValues[first].costSoFar+calculatedCost;
 							pathfindingValues[cell].parent = pathfindingValues[first];
 						}	
 					}
 				}
 			}
+
+			
 		}
 
 		// We haven't found the destination :(
@@ -118,14 +106,14 @@ public class PathfindingUtil{
 	}
 
 	// Nullable
-	public static HexCell findClosestOpenCell(HexCell target, out int distance, PathfindingConditional conditional){
+	public static HexCell findClosestOpenCell(BaseUnit unit, HexCell target, out int distance, PathfindingConditional conditional){
 		List<HexCell> toTest = new List<HexCell>();
 
 		toTest.Add(target);
 		int i = 0;
 
 		while(i < toTest.Count){
-			if(conditional.check(toTest[i])){
+			if(conditional.check(unit, toTest[i], target)){
 				distance = PathfindingUtil.hexGridDistance(target, toTest[i]);
 				return toTest[i];
 			}
@@ -136,15 +124,11 @@ public class PathfindingUtil{
 		return null;
 	}
 
-	public static HexCell findClosestOpenCell_TerrainAndUnits(HexCell target, out int distance){
-		return PathfindingUtil.findClosestOpenCell(target,out distance, checkTerrainAndUnits);
-	}
-
 	private class HexCellPathfinding{
 		public HexCell cell;
-		public int f{get{return g+h;}}
-		public int g;
-		public int h;
+		public int f{get{return costSoFar+distanceRemaining;}}
+		public int costSoFar;
+		public int distanceRemaining;
 		public HexCellPathfinding parent;
 	}
 

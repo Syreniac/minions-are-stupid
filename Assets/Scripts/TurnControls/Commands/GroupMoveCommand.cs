@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class GroupMoveCommand : ICommand {
 
-	public List<TestUnit> Units {get; private set;}
+	public List<BaseUnit> Units {get; private set;}
 
 	public HexCell Destination {get; private set;}
 
 	public GroupMoveCommand(){
-		Units = new List<TestUnit>();
+		Units = new List<BaseUnit>();
 		Destination = null;
 	}
 
 	public void Execute(){
-		foreach(TestUnit testUnit in Units){
-			testUnit.destination = Destination;
+		foreach(BaseUnit unit in Units){
+			unit.destination = Destination;
 		}
 	}
 
@@ -27,14 +27,11 @@ public class GroupMoveCommand : ICommand {
 		return Units.Count > 0 && Destination != null;
 	}
 
-	public void clickedCell(HexCell cell){
-		Debug.Log(Input.GetKey("left shift"));
-		if((Input.GetKey("left shift") || Units.Count == 0) && !Units.Contains(cell.Unit)){
-			if(cell.Unit != null){
-				Units.Add(cell.Unit);
-			}
+	public void clickedCell(HexCell cell, KeyCode key){
+		if(key == KeyCode.Mouse0 && cell.Unit != null && !Units.Contains(cell.Unit)){
+			Units.Add(cell.Unit);	
 		}
-		else{
+		else if(key == KeyCode.Mouse1){
 			Destination = cell;
 		}
 	}

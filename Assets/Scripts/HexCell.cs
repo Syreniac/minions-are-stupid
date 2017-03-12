@@ -23,7 +23,7 @@ public class HexCell : MonoBehaviour {
 	private Color color;
 	private int colorHeight =99999;
 
-	public TestUnit Unit {get; set;}
+	public BaseUnit Unit {get; set;}
 
     public float Priority { get; protected internal set; }
     public int QueueIndex { get; internal set; }

@@ -12,8 +12,6 @@ public class ReactionController : MonoBehaviour {
 
 	int steps;
 
-	readonly int MAXSTEPS = 1;
-
 	// Use this for initialization
 	void Start () {
 		Active = false;
@@ -22,7 +20,9 @@ public class ReactionController : MonoBehaviour {
 
 	public void begin(){
 		nextActionTime = 0f;
-		steps = MAXSTEPS;
+		foreach(BaseUnit unit in hexGrid.Units){
+			unit.prepareForReaction();
+		}
 	}
 	
 	// Update is called once per frame
@@ -30,15 +30,17 @@ public class ReactionController : MonoBehaviour {
 		if(Active){
 			Debug.Log("reaction controller run");
 			if(Time.time  > nextActionTime){
-				foreach(TestUnit testUnit in hexGrid.testUnits){
-					testUnit.findPath();
+				foreach(BaseUnit unit in hexGrid.Units){
+					if(unit.nextStepIsConflicted()){
+						unit.findPath();
+					}
 				}
-				foreach(TestUnit testUnit in hexGrid.testUnits){
-					testUnit.step();
+				foreach(BaseUnit unit in hexGrid.Units){
+					unit.step();
 				}
-				nextActionTime = Time.time + 0.5f;
+				nextActionTime = Time.time + 0.1f;
 				steps--;
-				if(steps == 0 || !hexGrid.canContinue()){
+				if(!hexGrid.canContinue()){
 					Active = false;
 				}
 				foreach(HexChunk chunk in hexGrid.chunks){
