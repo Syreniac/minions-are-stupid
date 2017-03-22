@@ -31,7 +31,7 @@ abstract public class BaseUnit : MonoBehaviour {
 						value.Unit = this;
 						updatePosition();}}
 
-    float height = 10f;
+    float height = 0f;
     List<HexCell> path;
     Vector3 vector {get{return hexCell.getPosition();}}
     float cellHeight {get{return hexCell.getHeight() + height;}}
@@ -90,5 +90,11 @@ abstract public class BaseUnit : MonoBehaviour {
 	public void prepareForReaction(){
 		energy = maximumEnergy;
 		// Post-process buffs/debuffs
+	}
+
+	public void Update() {
+		//transform.LookAt(Camera.main.transform.position, -Vector3.up);
+		transform.LookAt(new Vector3(Camera.main.transform.position.x, 100f, Camera.main.transform.position.z));
+		//transform.eulerAngles.x = 45.0f;
 	}
 }

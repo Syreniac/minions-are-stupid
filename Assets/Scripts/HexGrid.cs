@@ -165,35 +165,6 @@ public class HexGrid : MonoBehaviour {
 		widthInCells = width * HexMetrics.ChunkWidth;
 	}
 
-	void Update () {
-		HighlightHoveredCell();
-		if (Time.time > nextActionTime ){
-			nextActionTime = Time.time + 1f;
-			//testUnit.step();
-		}
-	}	
-
-	void HighlightHoveredCell(){
-	    Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
-	    if(!screenRect.Contains(Input.mousePosition)){
-	    	return;
-	    }
-		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hit;
-		if (Physics.Raycast(inputRay, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Chunks"))) {
-			HexChunk chunk = hit.collider.gameObject.GetComponent<HexChunk>();
-			HexCell cell = chunk.subtestCollision(inputRay);
-			if(cell != null){
-				cell.setHighlighted();
-				if(chunk != highlightedChunk){
-					highlightedChunk.RerenderCells();
-					highlightedChunk = chunk;
-				}
-				chunk.RerenderCells();
-			}
-		}
-	}
-
 	public HexCell projectRay(){
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
@@ -201,6 +172,17 @@ public class HexGrid : MonoBehaviour {
 			HexChunk chunk = hit.collider.gameObject.GetComponent<HexChunk>();
 			return chunk.subtestCollision(inputRay);
 		}
+		return null;
+	}
+
+	public HexCell projectRay(out HexChunk chunk){
+		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		if (Physics.Raycast(inputRay, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Chunks"))) {
+			chunk = hit.collider.gameObject.GetComponent<HexChunk>();
+			return chunk.subtestCollision(inputRay);
+		}
+		chunk = null;
 		return null;
 	}
 

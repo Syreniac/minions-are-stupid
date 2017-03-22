@@ -84,5 +84,11 @@ public class UserInputController : MonoBehaviour {
 		return null;
 	}
 
+	public void Button(){
+		Debug.Log("Button");
+		if(Active){
+			Active = false;
+		}
+	}
 
 }

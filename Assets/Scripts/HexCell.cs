@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class HexCell : MonoBehaviour {
 
-	private static HexCell highlightedCell = null; 
 
 	// Array indices
 	public int x, y, z;
@@ -27,6 +26,7 @@ public class HexCell : MonoBehaviour {
 
     public float Priority { get; protected internal set; }
     public int QueueIndex { get; internal set; }
+    public bool highlighted {get; set;}
 
 	// Use this for initialization
 	void Start () {
@@ -139,17 +139,12 @@ public class HexCell : MonoBehaviour {
 	}
 
 	void AddTriangleColor(List<Color> colors){
-		if(highlightedCell != null){
-			List<HexCell> highlightedCells = new List<HexCell>();
-			highlightedCells.Add(highlightedCell);
-			//highlightedCell.addNeighbourCells(highlightedCells);
-			if(highlightedCells.Contains(this)){
-				Color tempcolor = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
-				colors.Add(tempcolor);
-				colors.Add(tempcolor);
-				colors.Add(tempcolor);
-				return;
-			}
+		if(highlighted){
+			Color tempcolor = new Color(143f/255f, 27f/255f, 196f/255f, 1f);
+			colors.Add(tempcolor);
+			colors.Add(tempcolor);
+			colors.Add(tempcolor);
+			return;
 		}
 		if(height != colorHeight){
 			colorHeight = height;
@@ -188,10 +183,6 @@ public class HexCell : MonoBehaviour {
 
 	public void addHeight(){
 		height += 10;
-	}
-
-	public void setHighlighted(){
-		highlightedCell = this;
 	}
 
 	public void setHeight(int newHeight){

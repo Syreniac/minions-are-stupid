@@ -62,6 +62,8 @@
      <Compile Include="Assets\Scripts\TurnControls\ReactionController.cs" />
      <Compile Include="Assets\Scripts\TurnControls\TurnController.cs" />
      <Compile Include="Assets\Scripts\TurnControls\UserInputController.cs" />
+     <Compile Include="Assets\Scripts\UI\ThoughtBubble.cs" />
+     <Compile Include="Assets\Scripts\UI\TopLevelUI.cs" />
      <Compile Include="Assets\Scripts\Units\BaseUnit.cs" />
      <Compile Include="Assets\Scripts\Units\BaseUnitStats.cs" />
      <Compile Include="Assets\Scripts\Units\TestUnit.cs" />
