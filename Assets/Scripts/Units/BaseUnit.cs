@@ -1,28 +1,33 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-abstract public class BaseUnit : MonoBehaviour {
+public class BaseUnit : MonoBehaviour {
 
-	protected BaseUnitStats unitStats;
+	public enum Emotion { HAPPY, DESIRE, ANGRY, SCARED, SAD, CONFUSED};
+
+	protected ABaseUnitTemplate Template;
 
 	public int energy {get; set;}
 
-	public int maximumEnergy {get{return unitStats.maximumEnergy;}}
+	public int maximumEnergy {get{return Template.maximumEnergy;}}
 
-	public int energyPerCellMoved {get{return unitStats.energyPerCellMoved;}}
+	public int energyPerCellMoved {get{return Template.energyPerCellMoved;}}
 
-	public int energyPerHeightMovedDown {get{return unitStats.energyPerHeightMovedDown;}}
+	public int energyPerHeightMovedDown {get{return Template.energyPerHeightMovedDown;}}
 
-	public int energyPerHeightMovedUp {get{return unitStats.energyPerHeightMovedUp;}}
+	public int energyPerHeightMovedUp {get{return Template.energyPerHeightMovedUp;}}
 
-	public int maximumHeightPassableUp {get{return unitStats.maximumHeightPassableUp;}}
+	public int maximumHeightPassableUp {get{return Template.maximumHeightPassableUp;}}
 
-	public int maximumHeightPassableDown {get{return unitStats.maximumHeightPassableDown;}}
+	public int maximumHeightPassableDown {get{return Template.maximumHeightPassableDown;}}
 
-	public int maximumHealth {get{return unitStats.maximumHealth;}}
+	public int maximumHealth {get{return Template.maximumHealth;}}
 
 	private int health;
+
+	public Emotion emotion { get{return activeOpinion != null ? activeOpinion.getEmotion(this) : Emotion.CONFUSED;}}
 
 	private HexCell _hexCell;
 	public HexCell hexCell {get{return _hexCell;} 
@@ -35,14 +40,19 @@ abstract public class BaseUnit : MonoBehaviour {
     List<HexCell> path;
     Vector3 vector {get{return hexCell.getPosition();}}
     float cellHeight {get{return hexCell.getHeight() + height;}}
-    public HexCell destination;
 
-	public virtual void Make(HexCell initialCell){
+    private IGoal goal;
+
+    private IOpinion activeOpinion;
+
+	public virtual void Make(HexCell initialCell, ABaseUnitTemplate template){
 		hexCell = initialCell;
+		Template = template;
 	}
 
 	public bool canContinue(){
-		return path != null && path.Count > 1 && path[path.Count - 2].Unit == null && (energy > 0 && hexCell != destination);
+		Debug.Log(path);
+		return path != null && path.Count > 1 && path[path.Count - 2].Unit == null && (energy > 0 && hexCell != goal.getDestination());
 	}
 
 	private void updatePosition(){
@@ -50,10 +60,10 @@ abstract public class BaseUnit : MonoBehaviour {
 	}
 
 	public void findPath(){
-		if(destination != null && hexCell != destination){
+		if(goal.getDestination() != null && hexCell != goal.getDestination()){
 			int distance;
-			HexCell falseDestination = PathfindingUtil.findClosestOpenCell(this, destination, out distance, unitStats.getPathfindingConditional());
-			if(falseDestination != null && distance < PathfindingUtil.hexGridDistance(hexCell, destination)){
+			HexCell falseDestination = PathfindingUtil.findClosestOpenCell(this, goal.getDestination(), out distance, Template.getPathfindingConditional());
+			if(falseDestination != null && distance < PathfindingUtil.hexGridDistance(hexCell, goal.getDestination())){
 				findPath(falseDestination);
 			}
 			else{
@@ -63,15 +73,15 @@ abstract public class BaseUnit : MonoBehaviour {
 	}
 
 	/*
-	* Works backwards from the true destination to find the first open cell*/
+	* Works backwards from the true goal.getDestination() to find the first open cell*/
 
 	public void findPath(HexCell destination){
-		path = PathfindingUtil.findPath(this, hexCell, destination, unitStats.getPathfindingConditional(), unitStats.getPathfindingCalculator());
+		path = PathfindingUtil.findPath(this, hexCell, goal.getDestination(), Template.getPathfindingConditional(), Template.getPathfindingCalculator());
 	}
 
 	public void step(){
 		if(canContinue()){
-			int nextStepEnergyCost = unitStats.getPathfindingCalculator().calculate(this, path[path.Count - 2], hexCell);
+			int nextStepEnergyCost = Template.getPathfindingCalculator().calculate(this, path[path.Count - 2], hexCell);
 			if(nextStepEnergyCost <= energy){
 				hexCell = path[path.Count - 2];
 				path.Remove(path[path.Count - 2]);
@@ -84,12 +94,15 @@ abstract public class BaseUnit : MonoBehaviour {
 	}
 
 	public bool nextStepIsConflicted(){
-		return hexCell != destination && !canContinue();
+		return hexCell != goal.getDestination() && !canContinue();
 	}
 
 	public void prepareForReaction(){
 		energy = maximumEnergy;
 		// Post-process buffs/debuffs
+		activeOpinion = Template.getActiveOpinion(this);
+		goal = activeOpinion.getGoal(this);
+		findPath(goal.getDestination());
 	}
 
 	public void Update() {

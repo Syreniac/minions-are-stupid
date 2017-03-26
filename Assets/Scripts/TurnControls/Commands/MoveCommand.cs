@@ -14,7 +14,7 @@ public class MoveCommand : ICommand{
 	}
 
 	public void Execute(){
-		Unit.destination = Destination;
+		//Unit.destination = Destination;
 	}
 
 	public int getPriority(){

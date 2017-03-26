@@ -30,18 +30,18 @@ public class UserInputController : MonoBehaviour {
 			if(Input.GetKeyDown("space")){
 				Active = false;
 			}
-			else if(command != null && command.isReady()){
+			/*else if(command != null && command.isReady()){
 				executionController.postCommand(command);
 				Active = false;
 				command = null;
 			} else {
 				processCommand();
-			}
+			}*/
 		}
 	}
 
 	void processCommand(){
-		Nullable<KeyCode> keyCode = shouldMakeNewCommand();
+		/*Nullable<KeyCode> keyCode = shouldMakeNewCommand();
 		if(keyCode != null){
 			makeNewCommand(keyCode);
 		}
@@ -54,7 +54,7 @@ public class UserInputController : MonoBehaviour {
 					command.clickedCell(clickedCell, (KeyCode) keyCode);
 				}
 			}
-		}
+		}*/
 	}
 
 	Nullable<KeyCode> shouldClickGrid(){

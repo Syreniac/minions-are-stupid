@@ -15,7 +15,7 @@ public class GroupMoveCommand : ICommand {
 
 	public void Execute(){
 		foreach(BaseUnit unit in Units){
-			unit.destination = Destination;
+			//unit.destination = Destination;
 		}
 	}
 
